@@ -2,7 +2,6 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeo
 import { SelectiveProcess } from './selective_process'
 
 @Entity()
-@Unique('unique_email_process', ['email', 'selectiveProcessId'])
 export class Subscriber {
     @PrimaryGeneratedColumn()
     id: number;
