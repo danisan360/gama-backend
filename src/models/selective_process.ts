@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import { Contractor } from './contractor'
+import { Subscriber } from './subscriber';
 
 @Entity()
 export class SelectiveProcess {
@@ -31,4 +32,7 @@ export class SelectiveProcess {
       onDelete: 'CASCADE'
     })
     contractor: Contractor;
+
+    @OneToMany(() => Subscriber, subscriber => subscriber.selectiveProcesss)
+    subscribers: Subscriber[];
 }

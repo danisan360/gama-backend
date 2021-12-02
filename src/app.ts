@@ -8,6 +8,7 @@ import { PasswordHandler } from './helpers/password_handler'
 import expressHumps from 'express-humps'
 import cors from 'cors'
 import { Contractor } from './models/contractor'
+import { SubscriberDAO } from './controller/subscriberDAO'
 
 let corsOptions = {
   origin: process.env.ACCEPTED_URL
@@ -23,6 +24,7 @@ app.use(expressHumps())
 
 const connection = new ContractorDAO()
 const connectionProcess = new SelectiveProcessDao()
+const connectionSubscriber = new SubscriberDAO()
 
 app.post('/contratante', celebrate({
       [Segments.BODY]: Joi.object().keys({
@@ -368,6 +370,37 @@ app.get('/login/validartoken', celebrate({
     return response.json({ authorization: genUserToken({ id: contractor.id }) })
   else
     return response.status(403).json({ message: 'Invalid token.' })
+})
+
+app.post('/subscriber', async(request, response) => {
+  const { email, name, birth, selectiveProcessId} = request.body
+
+  let subscriber = await connectionSubscriber.subscribeInSelectiveProcess(email, name, birth, selectiveProcessId)
+
+  if(!subscriber)
+    return response.status(403).json({ message: 'It was not possible to enroll in the selective process.' })
+
+  const json = {
+    message: 'Foi inscrito',
+    id: subscriber.id,
+    email: subscriber.email,
+    name: subscriber.name,
+    birth: subscriber.birth,
+    selective_process_id: subscriber.selectiveProcesss
+    }
+  return response.json(json)
+})
+
+app.get('/subscriber', async(request, response) => {
+  const { selectiveProcessId} = request.body
+
+  let subscriber = await connectionSubscriber.getAllSubscribersInSelectiveProcess(selectiveProcessId)
+
+  if(!subscriber)
+    return response.status(403).json({ message: 'Erro' })
+
+  console.log(subscriber)
+  return response.json(subscriber)
 })
 
 app.use(errors())
